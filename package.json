@@ -9,16 +9,24 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "12.0.2",
+    "@material-table/core": "^0.2.9",
+    "@mui/icons-material": "^5.2.4",
+    "@mui/material": "^5.2.4",
+    "dexie": "3.2.0-beta.1",
+    "dexie-react-hooks": "^1.0.7",
+    "koyomi": "github:yukik/koyomi",
+    "moment-timezone": "^0.5.34",
+    "next": "^12.0.7",
     "react": "17.0.2",
     "react-dom": "17.0.2"
   },
   "devDependencies": {
-    "@types/node": "16.11.6",
-    "@types/react": "17.0.34",
+    "@types/node": "^16.11.14",
+    "@types/react": "17.0.37",
     "@types/react-dom": "^17.0.11",
-    "eslint": "7.32.0",
-    "eslint-config-next": "12.0.2",
-    "typescript": "4.4.4"
+    "eslint": "^8.4.1",
+    "eslint-config-next": "^12.0.7",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "typescript": "4.5.4"
   }
 }
