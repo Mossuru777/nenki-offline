@@ -1,11 +1,15 @@
 import moment, {Moment} from "moment-timezone";
 import assert from "assert";
+import Nenki from "./Nenki";
+import NenkiList from "./NenkiList";
 
 export type PersonFormData = {
   db_id: number | null,
   name: string,
   title: string,
   death_date: string,
+  next_nenki: Nenki | null,
+  last_nenki: Nenki | null,
   gyounen: number | null,
   kyounen: number | null,
   birth_date: string | null,
@@ -57,6 +61,11 @@ export default class Person {
   is_birth_date_accurate: boolean | null;
 
   /**
+   * 年忌法要のリスト
+   */
+  nenki_list: NenkiList;
+
+  /**
    * 人物情報クラス インスタンスを作成します
    * @param {number | null} db_id DBでのID
    * @param {string} name 名前
@@ -93,6 +102,7 @@ export default class Person {
     })();
     this.birth_date = birth_date;
     this.is_birth_date_accurate = birth_date !== null ? is_birth_date_accurate : null;
+    this.nenki_list = new NenkiList(this);
   }
 
   getFormData(): PersonFormData {
@@ -103,6 +113,8 @@ export default class Person {
       name: this.name,
       title: this.title,
       death_date,
+      next_nenki: this.nenki_list.next_nenki,
+      last_nenki: this.nenki_list.last_nenki,
       gyounen: this.gyounen,
       kyounen: this.kyounen,
       birth_date,
