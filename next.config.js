@@ -1,3 +1,5 @@
+const urlPrefix = process.env.URL_PREFIX ? `/${process.env.URL_PREFIX}` : "";
+
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
@@ -8,5 +10,9 @@ module.exports = {
       fs: false
     }
     return config;
-  }
+  },
+
+  assetPrefix: urlPrefix,
+  basePath: urlPrefix,
+  trailingSlash: true
 }
