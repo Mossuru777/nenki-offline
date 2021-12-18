@@ -35,15 +35,17 @@ export default function NenkiTable() {
                   <span>{p.death_date.format("YYYY/M/D")}</span>
                 </Tooltip>
               </TableCell>
-              {p.gyounen !== null &&
-              p.kyounen !== null
-                ? <TableCell align="right">
-                  <Tooltip title={`享年 (数え歳): ${p.kyounen}`}>
-                    <span>{p.gyounen}</span>
-                  </Tooltip>
-                </TableCell>
-                : <TableCell align="right">{p.gyounen}</TableCell>
-              }
+              <TableCell align="right">
+                {p.gyounen !== null
+                  ? p.kyounen !== null
+                    ?
+                    <Tooltip title={`享年 (数え歳): ${p.kyounen}`}>
+                      <span>{p.gyounen}</span>
+                    </Tooltip>
+                    : p.gyounen
+                  : "(不明)"
+                }
+              </TableCell>
               <TableCell align="right">{
                 p.birth_date !== null
                   ? (p.is_birth_date_accurate
@@ -54,7 +56,7 @@ export default function NenkiTable() {
                         <span>(不正確)</span>
                       </Tooltip>
                   )
-                  : "-"
+                  : "(不明)"
               }</TableCell>
             </TableRow>
           );
