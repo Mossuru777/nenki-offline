@@ -93,6 +93,7 @@ export default function DashboardContent() {
               <Grid container direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
                 <Grid item>
                   <LoadingButton variant="contained"
+                                 color="secondary"
                                  loading={downloading}
                                  disabled={!persons || persons.length === 0}
                                  startIcon={<DownloadForOfflineIcon/>}
@@ -103,7 +104,7 @@ export default function DashboardContent() {
                   </LoadingButton>
                 </Grid>
                 <Grid item>
-                  <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={() => setEditPerson(null)}>
+                  <Button variant="contained" color="primary" startIcon={<AddIcon/>} onClick={() => setEditPerson(null)}>
                     人物の追加
                   </Button>
                 </Grid>

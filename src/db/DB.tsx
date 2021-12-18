@@ -36,6 +36,13 @@ export default class DB extends Dexie {
     });
   }
 
+  async deletePerson(person: Person): Promise<void | PromiseRejectedResult> {
+    if (person.db_id === null) {
+      return Promise.reject("Person has no db_id.");
+    }
+    return this.persons.delete(person.db_id!);
+  }
+
   async getAllPersons(): Promise<Person[]> {
     return this.persons.toArray()
       .then((dp_array: DBPerson[]) => {

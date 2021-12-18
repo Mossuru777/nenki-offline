@@ -8,10 +8,12 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import {Box, Checkbox, FormControlLabel, useMediaQuery, useTheme} from "@mui/material";
+import {Box, Checkbox, DialogContentText, FormControlLabel, useMediaQuery, useTheme} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import DoneIcon from "@mui/icons-material/Done";
+import EditIcon from "@mui/icons-material/Done";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 export default function PersonEditDialog(props: { editPerson: Person | null | undefined, closeDialog: () => void }) {
   type PersonEditFormValues = {
@@ -56,6 +58,8 @@ export default function PersonEditDialog(props: { editPerson: Person | null | un
     {currentPerson, name, isNameValid, title, deathDate, isDeathDateValid, birthDate, isBirthDateValid, isBirthDateAccurate},
     setFormValues
   ] = React.useState<PersonEditFormValues>(() => getFormInitialValues(null));
+
+  const [manipulatingDB, setManipulatingDB] = React.useState<boolean>(false);
 
   const validate = async () => {
     const isNameValid = name.length > 0;
@@ -147,101 +151,153 @@ export default function PersonEditDialog(props: { editPerson: Person | null | un
 
   const handleAddOrUpdateBtn = () => {
     validate()
+      .then(() => setManipulatingDB(true))
       .then(addOrUpdateDB)
       .then(props.closeDialog)
       .catch((_error) => {
-      });
+      })
+      .finally(() => setManipulatingDB(false));
   };
+
+  const handleDeleteBtn = () => {
+    if (props.editPerson) {
+      setDeleteConfirmDialogOpen(true);
+    }
+  };
+
+  const handleActuallyDeleteOkBtn = () => {
+    setDeleteConfirmDialogOpen(false);
+    if (props.editPerson) {
+      setManipulatingDB(true);
+      DB.instance.deletePerson(props.editPerson)
+        .then(props.closeDialog)
+        .catch((_error) => {
+        })
+        .finally(() => setManipulatingDB(false));
+    }
+  }
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const open = currentPerson !== undefined;
+  const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = React.useState<boolean>(false);
 
   if (currentPerson !== props.editPerson) {
     setFormValues(() => getFormInitialValues(props.editPerson));
   }
 
   return (
-    <Dialog fullScreen={fullScreen} open={open}>
-      <DialogTitle>人物の追加</DialogTitle>
-      <DialogContent
-        sx={{
-          '& .MuiTextField-root': {m: 2},
-        }}
-      >
-        <Box sx={{display: "flex"}}>
-          <TextField
-            autoFocus
-            label="名前"
-            name="name"
-            value={name}
-            error={!isNameValid}
-            helperText={isNameValid ? null : "名前を入力して下さい"}
-            onChange={onTextChange}
-            variant="standard"
-            inputProps={{size: 30}}
-          />
-          <TextField
-            label="敬称"
-            name="title"
-            value={title}
-            onChange={onTextChange}
-            variant="standard"
-            inputProps={{size: 8}}
-          />
-        </Box>
-        <Box>
-          <TextField
-            label="命日"
-            type="date"
-            name="deathDate"
-            value={deathDate}
-            error={!isDeathDateValid}
-            helperText={isDeathDateValid ? null : "命日を入力して下さい"}
-            onChange={onTextChange}
-            variant="standard"
-            sx={{width: 220}}
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Box>
-        <Box sx={{display: "flex"}}>
-          <TextField
-            label="生年月日"
-            type="date"
-            name="birthDate"
-            value={birthDate}
-            error={!isBirthDateValid}
-            helperText={isBirthDateValid ? null : "命日より前の日付を入力して下さい"}
-            onChange={onTextChange}
-            variant="standard"
-            sx={{width: 220}}
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="isBirthDateAccurate"
-                checked={isBirthDateAccurate}
-                onChange={onCheckboxChange}
-                color="primary"
-              />
-            }
-            label="生年月日は正確です"
-          />
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button variant="outlined" color="error" startIcon={<DeleteIcon/>} onClick={props.closeDialog}>キャンセル</Button>
-        {
-          props.editPerson
-            ? <Button variant="contained" endIcon={<DoneIcon/>} onClick={handleAddOrUpdateBtn}>更新</Button>
-            : <Button variant="contained" endIcon={<AddIcon/>} onClick={handleAddOrUpdateBtn}>追加</Button>
-        }
-      </DialogActions>
-    </Dialog>
+    <Box>
+      <Dialog fullScreen={fullScreen} open={open}>
+        <DialogTitle>人物の追加</DialogTitle>
+        <DialogContent
+          sx={{
+            '& .MuiTextField-root': {m: 2},
+          }}
+        >
+          <Box sx={{display: "flex"}}>
+            <TextField
+              autoFocus
+              label="名前"
+              name="name"
+              value={name}
+              error={!isNameValid}
+              helperText={isNameValid ? null : "名前を入力して下さい"}
+              onChange={onTextChange}
+              variant="standard"
+              inputProps={{size: 30}}
+            />
+            <TextField
+              label="敬称"
+              name="title"
+              value={title}
+              onChange={onTextChange}
+              variant="standard"
+              inputProps={{size: 8}}
+            />
+          </Box>
+          <Box>
+            <TextField
+              label="命日"
+              type="date"
+              name="deathDate"
+              value={deathDate}
+              error={!isDeathDateValid}
+              helperText={isDeathDateValid ? null : "命日を入力して下さい"}
+              onChange={onTextChange}
+              variant="standard"
+              sx={{width: 220}}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box sx={{display: "flex"}}>
+            <TextField
+              label="生年月日"
+              type="date"
+              name="birthDate"
+              value={birthDate}
+              error={!isBirthDateValid}
+              helperText={isBirthDateValid ? null : "命日より前の日付を入力して下さい"}
+              onChange={onTextChange}
+              variant="standard"
+              sx={{width: 220}}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="isBirthDateAccurate"
+                  checked={isBirthDateAccurate}
+                  onChange={onCheckboxChange}
+                  color="primary"
+                />
+              }
+              label="生年月日は正確です"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          {
+            props.editPerson
+              ? <LoadingButton color="error" disabled={manipulatingDB} onClick={handleDeleteBtn}>
+                <DeleteIcon/>
+              </LoadingButton>
+              : null
+          }
+          <div style={{flexGrow: 1}}/>
+          <Button variant="outlined" color="error" disabled={manipulatingDB} startIcon={<CancelOutlinedIcon/>}
+                  onClick={props.closeDialog}>キャンセル</Button>
+          {
+            props.editPerson
+              ? <LoadingButton variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
+                               startIcon={<EditIcon/>} onClick={handleAddOrUpdateBtn}
+              >
+                更新
+              </LoadingButton>
+              : <LoadingButton variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
+                               startIcon={<AddIcon/>} onClick={handleAddOrUpdateBtn}
+              >
+                追加
+              </LoadingButton>
+          }
+        </DialogActions>
+      </Dialog>
+      <Dialog open={deleteConfirmDialogOpen}>
+        <DialogTitle>確認</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {props.editPerson?.name}{props.editPerson?.title} のデータを削除しますが、よろしいですか?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmDialogOpen(false)}>キャンセル</Button>
+          <Button color="error" onClick={handleActuallyDeleteOkBtn} autoFocus>OK</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }
