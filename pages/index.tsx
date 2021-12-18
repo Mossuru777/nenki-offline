@@ -6,12 +6,18 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
-import {AppBar, Fab} from "@mui/material";
-import Title from "./Title";
+import {AppBar, Grid} from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
+import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import {useLiveQuery} from "dexie-react-hooks";
+import DB from "../src/db/DB";
+import Title from "./Title";
 import NenkiTable from "./NenkiTable";
 import PersonEditDialog from "./PersonEditDialog";
 import Person from "../src/model/Person";
+import generate_ics_blob_url from "../src/util/generate_ics_blob_url";
 
 function Copyright(props: any) {
   return (
@@ -29,8 +35,26 @@ function Copyright(props: any) {
 const mdTheme = createTheme();
 
 export default function DashboardContent() {
+  // personsが変更されたときにコンポーネントは自動的に再レンダリングされます
+  const persons = useLiveQuery(() => DB.instance.getAllPersons());
+
   const [editPerson, setEditPerson] = React.useState<Person | null | undefined>(undefined);
   const closePersonEditDialog = () => setEditPerson(undefined);
+
+  const [downloading, setDownloading] = React.useState(false);
+  const handleDownloadButton = () => {
+    if (downloading || !persons) {
+      return;
+    }
+    setDownloading(true);
+    const [url, createDate] = generate_ics_blob_url(persons);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `nenki_${createDate.format("YYYY-MM-DD_HH-mm-ss")}.ics`;
+    a.click();
+    a.remove();
+    setDownloading(false);
+  }
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -64,15 +88,28 @@ export default function DashboardContent() {
           <Toolbar/>
           <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
             <Title>一覧</Title>
-            <NenkiTable setEditPerson={setEditPerson}/>
-            <Box mt={2} sx={{display: "flex", justifyContent: "flex-end"}}>
-              <Box>
-                <Fab size="medium" color="primary" onClick={() => setEditPerson(null)}>
-                  <AddIcon/>
-                </Fab>
-                <PersonEditDialog editPerson={editPerson} closeDialog={closePersonEditDialog}/>
-              </Box>
+            <NenkiTable persons={persons} setEditPerson={setEditPerson}/>
+            <Box mt={2}>
+              <Grid container direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
+                <Grid item>
+                  <LoadingButton variant="contained"
+                                 loading={downloading}
+                                 disabled={!persons || persons.length === 0}
+                                 startIcon={<DownloadForOfflineIcon/>}
+                                 loadingPosition="start"
+                                 onClick={handleDownloadButton}
+                  >
+                    ダウンロード
+                  </LoadingButton>
+                </Grid>
+                <Grid item>
+                  <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={() => setEditPerson(null)}>
+                    人物の追加
+                  </Button>
+                </Grid>
+              </Grid>
             </Box>
+            <PersonEditDialog editPerson={editPerson} closeDialog={closePersonEditDialog}/>
             <Copyright sx={{pt: 4}}/>
           </Container>
         </Box>

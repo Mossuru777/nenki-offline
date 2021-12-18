@@ -1,6 +1,4 @@
 import * as React from "react";
-import {useLiveQuery} from "dexie-react-hooks";
-import DB from "../src/db/DB";
 import Person from "../src/model/Person";
 import HourglassEmptyRoundedIcon from "@mui/icons-material/HourglassEmptyRounded";
 import Link from "@mui/material/Link";
@@ -16,15 +14,12 @@ import Tooltip from "@mui/material/Tooltip";
 // @ts-ignore
 import koyomi from "koyomi";
 
-export default function NenkiTable(props: { setEditPerson: (person: Person) => void }) {
-  // personsが変更されたときにコンポーネントは自動的に再レンダリングされます
-  const persons = useLiveQuery(() => DB.instance.getAllPersons());
-
+export default function NenkiTable(props: { persons: Person[] | undefined, setEditPerson: (person: Person) => void }) {
   const table_body = (() => {
-    if (persons) {
-      if (persons.length > 0) {
+    if (props.persons) {
+      if (props.persons.length > 0) {
         // データが存在する時
-        return persons.map(p =>
+        return props.persons.map(p =>
           <TableRow
             key={p.db_id}
             sx={{"&:last-child td, &:last-child th": {border: 0}}}
