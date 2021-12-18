@@ -10,6 +10,7 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import Tooltip from "@mui/material/Tooltip";
+import Box from "@mui/material/Box";
 
 // @ts-ignore
 import koyomi from "koyomi";
@@ -35,6 +36,37 @@ export default function NenkiTable(props: { persons: Person[] | undefined, setEd
               </Tooltip>
             </TableCell>
             <TableCell align="right">
+              {
+                p.nenki_list.next_nenki
+                  ?
+                  <Tooltip title={
+                    <Box>
+                      {koyomi.format(p.nenki_list.next_nenki.date.format("YYYY-M-D"), "GGN年M月D日>>元年")}
+                      {
+                        p.nenki_list.last_nenki
+                          ? <Box mt={1}>
+                            [前回]
+                            <br/>
+                            {p.nenki_list.last_nenki.title}: {p.nenki_list.last_nenki.date.format("YYYY/M/D")} ({koyomi.format(p.nenki_list.last_nenki.date.format("YYYY-M-D"), "GGN年M月D日>>元年")})
+                          </Box>
+                          : null
+                      }
+                    </Box>
+                  }>
+                    <span>{p.nenki_list.next_nenki.title}: {p.nenki_list.next_nenki.date.format("YYYY/M/D")}</span>
+                  </Tooltip>
+                  : <Tooltip title={
+                    <Box>
+                      [前回]
+                      <br/>
+                      {p.nenki_list.last_nenki!.title}: {p.nenki_list.last_nenki!.date.format("YYYY/M/D")} ({koyomi.format(p.nenki_list.last_nenki!.date.format("YYYY-M-D"), "GGN年M月D日>>元年")})
+                    </Box>
+                  }>
+                    <span>{p.nenki_list.last_nenki!.title}が終わっています</span>
+                  </Tooltip>
+              }
+            </TableCell>
+            <TableCell align="right">
               {p.gyounen !== null
                 ? p.kyounen !== null
                   ?
@@ -51,7 +83,9 @@ export default function NenkiTable(props: { persons: Person[] | undefined, setEd
                     ? <Tooltip title={koyomi.format(p.birth_date.format("YYYY-M-D"), "GGN年M月D日>>元年")}>
                       <span>{p.birth_date.format("YYYY/M/D")}</span>
                     </Tooltip>
-                    : <Tooltip title={`${p.birth_date.format("YYYY/M/D")} (${koyomi.format(p.birth_date.format("YYYY-M-D"), "GGN年M月D日>>元年")}) 頃`}>
+                    : <Tooltip title={
+                      `${p.birth_date.format("YYYY/M/D")} (${koyomi.format(p.birth_date.format("YYYY-M-D"), "GGN年M月D日>>元年")}) 頃`}
+                    >
                       <span>(不正確)</span>
                     </Tooltip>
                 )
@@ -85,6 +119,7 @@ export default function NenkiTable(props: { persons: Person[] | undefined, setEd
           <TableRow>
             <TableCell>名前</TableCell>
             <TableCell align="right">命日</TableCell>
+            <TableCell align="right">次の年忌法要</TableCell>
             <TableCell align="right">行年 (満年齢)</TableCell>
             <TableCell align="right">生年月日</TableCell>
           </TableRow>

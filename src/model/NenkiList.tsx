@@ -41,10 +41,9 @@ export default class NenkiList {
       dates.push(new Nenki(moment.duration(years_elapsed, "years"), person));
     }
 
-    this.nenki_array = Object.freeze(dates);
+    this.nenki_array = Object.freeze(Array.from(dates));
 
-    const nenki_exclude_death_date = dates.slice(1);
-    this.next_nenki = nenki_exclude_death_date.find(n => n.date.isSameOrAfter(NenkiList.#TODAY)) ?? null;
-    this.last_nenki = nenki_exclude_death_date.reverse().find(n => n.date.isBefore(NenkiList.#TODAY)) ?? null;
+    this.next_nenki = dates.find(n => n.title !== null && n.date.isSameOrAfter(NenkiList.#TODAY)) ?? null;
+    this.last_nenki = dates.reverse().find(n => n.title !== null && n.date.isBefore(NenkiList.#TODAY)) ?? null;
   }
 }

@@ -36,6 +36,12 @@ export default class Nenki {
   readonly date: Moment;
 
   /**
+   * 法要名
+   * (法要を行う日ではない場合はnull)
+   */
+  readonly title: string | null;
+
+  /**
    * 概要
    */
   readonly summary: string;
@@ -75,6 +81,7 @@ export default class Nenki {
     };
 
     if (houyou !== undefined) {
+      this.title = houyou !== Nenki.#HOUYOU_ARRAY[0] ? houyou[1] : null; // 命日は法要ではないため除外
       this.summary = `${person.name}${person.title} ${houyou[1]}`;
       this.description = `${this.summary}`;
       if (days === 0) {
@@ -94,6 +101,7 @@ export default class Nenki {
         this.description += generate_nenki_duration_description_str();
       }
     } else {
+      this.title = null;
       this.summary = `${person.name}${person.title} 命日`;
       this.description = `${this.summary}${generate_nenki_duration_description_str()}`;
     }
