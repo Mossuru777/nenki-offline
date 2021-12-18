@@ -1,42 +1,20 @@
 import moment, {Moment} from "moment-timezone";
 import assert from "assert";
-import Nenki from "./Nenki";
 import NenkiList from "./NenkiList";
-
-export type PersonFormData = {
-  db_id: number | null,
-  name: string,
-  title: string,
-  death_date: string,
-  next_nenki: Nenki | null,
-  last_nenki: Nenki | null,
-  gyounen: number | null,
-  kyounen: number | null,
-  birth_date: string | null,
-  is_birth_date_accurate: boolean | null
-};
 
 export default class Person {
   /**
    * DBでのID
-   * @type {number|null}
    */
   db_id: number | null;
   /**
    * 名前
-   * @type {string}
    */
   name: string;
   /**
    * 敬称
-   * @type {string}
    */
   title: string;
-  /**
-   * 命日
-   * @type {Moment}
-   */
-  death_date: Moment;
   /**
    * 行年 (満年齢)
    * @type {number | null}
@@ -44,26 +22,16 @@ export default class Person {
   gyounen: number | null;
   /**
    * 享年 (数え年)
-   * @type {number | null}
    */
   kyounen: number | null;
-
   /**
    * 生年月日
-   * @type {Moment | null}
    */
   birth_date: Moment | null;
-
   /**
    * 生年月日は正確かどうか (birth_dateがnull時はnull)
-   * @type {boolean | null}
    */
   is_birth_date_accurate: boolean | null;
-
-  /**
-   * 年忌法要のリスト
-   */
-  nenki_list: NenkiList;
 
   /**
    * 人物情報クラス インスタンスを作成します
@@ -80,7 +48,7 @@ export default class Person {
     this.db_id = db_id;
     this.name = name;
     this.title = title;
-    this.death_date = death_date;
+    this._death_date = death_date;
     this.gyounen = birth_date !== null ? death_date.diff(birth_date, "years") : null;
     this.kyounen = (() => {
       if (this.gyounen === null) {
@@ -102,23 +70,40 @@ export default class Person {
     })();
     this.birth_date = birth_date;
     this.is_birth_date_accurate = birth_date !== null ? is_birth_date_accurate : null;
-    this.nenki_list = new NenkiList(this);
+    this._nenki_list = new NenkiList(this);
   }
 
-  getFormData(): PersonFormData {
-    const death_date = this.death_date.format("YYYY-MM-DD");
-    const birth_date = this.birth_date?.format("YYYY-MM-DD") ?? null;
-    return {
-      db_id: this.db_id,
-      name: this.name,
-      title: this.title,
-      death_date,
-      next_nenki: this.nenki_list.next_nenki,
-      last_nenki: this.nenki_list.last_nenki,
-      gyounen: this.gyounen,
-      kyounen: this.kyounen,
-      birth_date,
-      is_birth_date_accurate: this.is_birth_date_accurate
+  /**
+   * 命日
+   * @private
+   */
+  private _death_date: Moment;
+
+  /**
+   * 命日
+   */
+  get death_date(): Moment {
+    return this._death_date;
+  }
+
+  set death_date(date) {
+    if (date.isSame(this._death_date)) {
+      return;
     }
-  };
+    this._death_date = moment(date);
+    this._nenki_list = new NenkiList(this);
+  }
+
+  /**
+   * 年忌法要のリスト
+   * @private
+   */
+  private _nenki_list: NenkiList;
+
+  /**
+   * 年忌法要のリスト
+   */
+  get nenki_list(): NenkiList {
+    return this._nenki_list;
+  }
 }

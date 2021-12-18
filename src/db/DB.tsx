@@ -26,6 +26,16 @@ export default class DB extends Dexie {
     return this.persons.add(dp);
   }
 
+  async updatePerson(person: Person): Promise<number> {
+    return this.persons.update(person.db_id!, {
+      name: person.name,
+      title: person.title,
+      death_date_unixtime: person.death_date.valueOf(),
+      birth_date_unixtime: person.birth_date?.valueOf() ?? null,
+      is_birth_date_accurate: person.is_birth_date_accurate
+    });
+  }
+
   async getAllPersons(): Promise<Person[]> {
     return this.persons.toArray()
       .then((dp_array: DBPerson[]) => {

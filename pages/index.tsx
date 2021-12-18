@@ -6,10 +6,12 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
-import {AppBar} from "@mui/material";
+import {AppBar, Fab} from "@mui/material";
 import Title from "./Title";
+import AddIcon from "@mui/icons-material/Add";
 import NenkiTable from "./NenkiTable";
-import AddPersonFabAndDialog from "./AddPersonFabAndDialog";
+import PersonEditDialog from "./PersonEditDialog";
+import Person from "../src/model/Person";
 
 function Copyright(props: any) {
   return (
@@ -27,6 +29,9 @@ function Copyright(props: any) {
 const mdTheme = createTheme();
 
 export default function DashboardContent() {
+  const [editPerson, setEditPerson] = React.useState<Person | null | undefined>(undefined);
+  const closePersonEditDialog = () => setEditPerson(undefined);
+
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{display: 'flex'}}>
@@ -59,9 +64,14 @@ export default function DashboardContent() {
           <Toolbar/>
           <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
             <Title>一覧</Title>
-            <NenkiTable/>
+            <NenkiTable setEditPerson={setEditPerson}/>
             <Box mt={2} sx={{display: "flex", justifyContent: "flex-end"}}>
-              <AddPersonFabAndDialog/>
+              <Box>
+                <Fab size="medium" color="primary" onClick={() => setEditPerson(null)}>
+                  <AddIcon/>
+                </Fab>
+                <PersonEditDialog editPerson={editPerson} closeDialog={closePersonEditDialog}/>
+              </Box>
             </Box>
             <Copyright sx={{pt: 4}}/>
           </Container>
