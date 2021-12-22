@@ -7,7 +7,7 @@
   "background_color": "#f5f5f5",
   "display": "standalone",
   "scope": "./",
-  "start_url": "/",
+  "start_url": "./",
   "icons": [
     {
       "src": "assets/pwa/icons/nextjs-icon-dark.svg",
