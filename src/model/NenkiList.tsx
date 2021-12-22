@@ -35,6 +35,7 @@ export default class NenkiList {
   constructor(person: Person) {
     const dates = [
       new Nenki(moment.duration(0), person),
+      new Nenki(moment.duration(48, "days"), person),
       new Nenki(moment.duration(99, "days"), person)
     ];
     for (let years_elapsed = 1; years_elapsed <= 49; years_elapsed++) {
