@@ -1,7 +1,8 @@
+const withPWA = require("next-pwa");
 const urlPrefix = process.env.URL_PREFIX ? `/${process.env.URL_PREFIX}` : "";
 
 /** @type {import('next').NextConfig} */
-module.exports = {
+module.exports = withPWA({
   reactStrictMode: true,
 
   webpack: (config) => {
@@ -14,5 +15,10 @@ module.exports = {
 
   assetPrefix: urlPrefix,
   basePath: urlPrefix,
-  trailingSlash: true
-}
+  trailingSlash: true,
+
+  pwa: {
+    dest: "public",
+    disable: process.env.NODE_ENV === "development"
+  }
+});

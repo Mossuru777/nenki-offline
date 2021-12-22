@@ -34,7 +34,7 @@ function Copyright(props: any) {
 
 const mdTheme = createTheme();
 
-export default function DashboardContent() {
+export default function MainPage() {
   // personsが変更されたときにコンポーネントは自動的に再レンダリングされます
   const persons = useLiveQuery(() => DB.instance.getAllPersons());
 
