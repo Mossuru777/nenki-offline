@@ -18,7 +18,7 @@
     "dexie-react-hooks": "^1.1.1",
     "ical-generator": "^3.5.1",
     "koyomi": "github:yukik/koyomi",
-    "moment-timezone": "^0.5.34",
+    "moment-timezone": "^0.5.35",
     "next": "^12.2.5",
     "next-pwa": "^5.5.5",
     "react": "18.2.0",
