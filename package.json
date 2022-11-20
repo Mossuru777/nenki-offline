@@ -1,7 +1,7 @@
 {
   "name": "nenki-offline",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,27 +10,27 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@material-table/core": "^0.2.48",
-    "@mui/icons-material": "^5.10.9",
-    "@mui/lab": "^5.0.0-alpha.103",
-    "@mui/material": "^5.10.9",
+    "@material-table/core": "^0.2.53",
+    "@mui/icons-material": "^5.10.14",
+    "@mui/lab": "^5.0.0-alpha.108",
+    "@mui/material": "^5.10.14",
     "dexie": "3.2.2",
     "dexie-react-hooks": "^1.1.1",
-    "ical-generator": "^3.5.2",
+    "ical-generator": "^3.6.0",
     "koyomi": "github:yukik/koyomi",
-    "moment-timezone": "^0.5.37",
+    "moment-timezone": "^0.5.39",
     "next": "^12.3.1",
     "next-pwa": "^5.6.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^18.8.4",
-    "@types/react": "18.0.21",
-    "@types/react-dom": "^18.0.6",
-    "eslint": "^8.25.0",
+    "@types/node": "^18.11.9",
+    "@types/react": "18.0.25",
+    "@types/react-dom": "^18.0.9",
+    "eslint": "^8.28.0",
     "eslint-config-next": "^12.3.1",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "typescript": "4.8.4"
+    "typescript": "4.9.3"
   }
 }
