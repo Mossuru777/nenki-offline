@@ -8,14 +8,6 @@ const urlPrefix = process.env.URL_PREFIX ? `/${process.env.URL_PREFIX}` : undefi
 module.exports = withPWA({
     reactStrictMode: true,
 
-    webpack: (config) => {
-        config.resolve.fallback = {
-            ...config.resolve.fallback,
-            fs: false
-        }
-        return config;
-    },
-
     assetPrefix: urlPrefix,
     basePath: urlPrefix,
     trailingSlash: true

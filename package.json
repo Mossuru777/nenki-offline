@@ -1,7 +1,7 @@
 {
   "name": "nenki-offline",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.1.6",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -16,7 +16,7 @@
     "@mui/material": "^5.10.14",
     "dexie": "3.2.2",
     "dexie-react-hooks": "^1.1.1",
-    "ical-generator": "^3.6.0",
+    "ics": "^2.41.0",
     "koyomi": "github:yukik/koyomi",
     "moment-timezone": "^0.5.39",
     "next": "^12.3.1",
