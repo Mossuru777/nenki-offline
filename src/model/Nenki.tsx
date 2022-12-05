@@ -21,7 +21,6 @@ export default class Nenki {
     [moment.duration(12, "years"), "十三回忌法要",],
     [moment.duration(16, "years"), "十七回忌法要",],
     [moment.duration(22, "years"), "二十三回忌法要",],
-    [moment.duration(24, "years"), "二十五回忌法要",],
     [moment.duration(26, "years"), "二十七回忌法要",],
     [moment.duration(32, "years"), "三十三回忌法要",],
     [moment.duration(36, "years"), "三十七回忌法要",],
