@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump type
+        required: true
+        default: patch
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      dry_run:
+        description: Dry run
+        required: true
+        default: false
+        type: boolean
+      draft:
+        description: Draft
+        required: true
+        default: false
+        type: boolean
+      pre_release:
+        description: Pre Release
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  bump-version:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: MeilCli/bump-release-action@v1
+        with:
+          config_path: .github/bump.yml
+          bump: ${{ github.event.inputs.bump }}
+          dry_run: ${{ github.event.inputs.dry_run }}
+          draft: ${{ github.event.inputs.draft }}
+          pre_release: ${{ github.event.inputs.pre_release }}
+
+  build-and-deploy:
+    name: Build and Deploy
+    needs: bump-version
+    uses: ./.github/workflows/build_and_optionally_deploy.yml
+    with:
+      deploy: true

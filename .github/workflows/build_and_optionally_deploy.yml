@@ -1,0 +1,64 @@
+name: Build and optionally deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags-ignore: [ 'v*' ]
+
+  pull_request:
+    branches: [ main ]
+
+  workflow_call:
+    inputs:
+      deploy:
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  build-and-optionally-deploy:
+    name: Build (optionally deploy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+
+      - name: Get Node.js and npm versions
+        shell: bash
+        run: |
+          echo "NODE_VERSION=$(node --version)" >> $GITHUB_ENV
+          echo "NPM_VERSION=$(npm --version)" >> $GITHUB_ENV
+
+      - name: Cache npm cache directory
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-cache-${{ env.NODE_VERSION }}-${{ env.NPM_VERSION }}
+
+      - name: Install npm packages
+        shell: bash
+        run: npm ci --no-progress --no-audit
+
+      - name: Build Next.js app
+        shell: bash
+        run: npm run build
+        env:
+          URL_PREFIX: ${{ github.event.repository.name }}
+
+      - name: Export Next.js app
+        id: export_app
+        if: ${{ inputs.deploy == true }}
+        shell: bash
+        run: npm run export
+
+      - name: Deploy Next.js app to GitHub Pages
+        if: ${{ steps.export_app.outcome == 'success' }}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: out
