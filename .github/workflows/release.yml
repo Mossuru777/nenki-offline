@@ -32,21 +32,31 @@ jobs:
   bump-version:
     name: Bump Version
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # 前回リリースからの変更履歴を取得できるようにする。
+          fetch-depth: 0
+          persist-credentials: false
 
-      - uses: MeilCli/bump-release-action@v1
+      - uses: MeilCli/bump-release-action@c07980926b3f330788297279580f7f16f0633008 # v3.0.15
         with:
           config_path: .github/bump.yml
-          bump: ${{ github.event.inputs.bump }}
-          dry_run: ${{ github.event.inputs.dry_run }}
-          draft: ${{ github.event.inputs.draft }}
-          pre_release: ${{ github.event.inputs.pre_release }}
+          bump: ${{ inputs.bump }}
+          dry_run: ${{ inputs.dry_run }}
+          draft: ${{ inputs.draft }}
+          pre_release: ${{ inputs.pre_release }}
 
   build-and-deploy:
     name: Build and Deploy
     needs: bump-version
+    permissions:
+      contents: write
     uses: ./.github/workflows/build_and_optionally_deploy.yml
     with:
-      deploy: true
+      # 試行実行ではビルドだけを行い、公開ブランチを更新しない。
+      deploy: ${{ !inputs.dry_run }}

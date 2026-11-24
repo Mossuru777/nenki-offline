@@ -1,5 +1,5 @@
 import * as React from "react";
-import moment from "moment";
+import moment from "moment-timezone";
 import Person from "../src/model/Person";
 import DB from "../src/db/DB";
 import Button from "@mui/material/Button";
@@ -13,7 +13,6 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Done";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
-import LoadingButton from "@mui/lab/LoadingButton";
 
 export default function PersonEditDialog(props: { editPerson: Person | null | undefined, closeDialog: () => void }) {
   type PersonEditFormValues = {
@@ -129,17 +128,11 @@ export default function PersonEditDialog(props: { editPerson: Person | null | un
       const momentDeathDate = moment.tz(deathDate, "YYYY-MM-DD", true, "Asia/Tokyo");
       const momentBirthDate = birthDate !== "" ? moment.tz(birthDate, "YYYY-MM-DD", true, "Asia/Tokyo") : null;
       const actualIsBirthDateAccurate = momentBirthDate !== null ? isBirthDateAccurate : null;
-      if (props.editPerson) {
-        props.editPerson.name = name;
-        props.editPerson.title = title;
-        props.editPerson.death_date = momentDeathDate;
-        props.editPerson.birth_date = momentBirthDate;
-        props.editPerson.is_birth_date_accurate = actualIsBirthDateAccurate;
-        return DB.instance.updatePerson(props.editPerson)
-      } else {
-        const add_person = new Person(null, name, title, momentDeathDate, momentBirthDate, actualIsBirthDateAccurate);
-        return DB.instance.addPerson(add_person);
-      }
+      const person = new Person(
+        props.editPerson?.db_id ?? null,
+        name, title, momentDeathDate, momentBirthDate, actualIsBirthDateAccurate
+      );
+      return props.editPerson ? DB.instance.updatePerson(person) : DB.instance.addPerson(person);
     } else {
       return Promise.reject({
         isNameValid,
@@ -263,9 +256,9 @@ export default function PersonEditDialog(props: { editPerson: Person | null | un
         <DialogActions>
           {
             props.editPerson
-              ? <LoadingButton color="error" disabled={manipulatingDB} onClick={handleDeleteBtn}>
+              ? <Button color="error" disabled={manipulatingDB} onClick={handleDeleteBtn}>
                 <DeleteIcon/>
-              </LoadingButton>
+              </Button>
               : null
           }
           <div style={{flexGrow: 1}}/>
@@ -273,16 +266,16 @@ export default function PersonEditDialog(props: { editPerson: Person | null | un
                   onClick={props.closeDialog}>キャンセル</Button>
           {
             props.editPerson
-              ? <LoadingButton variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
+              ? <Button variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
                                startIcon={<EditIcon/>} onClick={handleAddOrUpdateBtn}
               >
                 更新
-              </LoadingButton>
-              : <LoadingButton variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
+              </Button>
+              : <Button variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
                                startIcon={<AddIcon/>} onClick={handleAddOrUpdateBtn}
               >
                 追加
-              </LoadingButton>
+              </Button>
           }
         </DialogActions>
       </Dialog>

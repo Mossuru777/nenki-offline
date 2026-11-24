@@ -1,6 +1,6 @@
 import moment from "moment-timezone";
-import Person from "./Person";
-import Nenki from "./Nenki";
+import type Person from "./Person.ts";
+import Nenki from "./Nenki.ts";
 
 /**
  * 年忌法要のリスト

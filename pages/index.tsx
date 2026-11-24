@@ -7,7 +7,6 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
 import {AppBar, Grid} from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
@@ -92,7 +91,7 @@ export default function MainPage() {
             <Box mt={2}>
               <Grid container direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
                 <Grid item>
-                  <LoadingButton variant="contained"
+                  <Button variant="contained"
                                  color="secondary"
                                  loading={downloading}
                                  disabled={!persons || persons.length === 0}
@@ -101,7 +100,7 @@ export default function MainPage() {
                                  onClick={handleDownloadButton}
                   >
                     ダウンロード
-                  </LoadingButton>
+                  </Button>
                 </Grid>
                 <Grid item>
                   <Button variant="contained" color="primary" startIcon={<AddIcon/>} onClick={() => setEditPerson(null)}>

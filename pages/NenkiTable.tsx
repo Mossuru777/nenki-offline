@@ -12,8 +12,7 @@ import TableBody from "@mui/material/TableBody";
 import Tooltip from "@mui/material/Tooltip";
 import Box from "@mui/material/Box";
 
-// @ts-ignore
-import koyomi from "koyomi";
+import formatWareki from "../src/util/formatWareki";
 
 export default function NenkiTable(props: { persons: Person[] | undefined, setEditPerson: (person: Person) => void }) {
   const table_body = (() => {
@@ -31,7 +30,7 @@ export default function NenkiTable(props: { persons: Person[] | undefined, setEd
               </Link>
             </TableCell>
             <TableCell align="right">
-              <Tooltip title={koyomi.format(p.death_date.format("YYYY-M-D"), "GGN年M月D日>>元年")}>
+              <Tooltip title={formatWareki(p.death_date)}>
                 <span>{p.death_date.format("YYYY/M/D")}</span>
               </Tooltip>
             </TableCell>
@@ -41,13 +40,13 @@ export default function NenkiTable(props: { persons: Person[] | undefined, setEd
                   ?
                   <Tooltip title={
                     <Box>
-                      {koyomi.format(p.nenki_list.next_nenki.date.format("YYYY-M-D"), "GGN年M月D日>>元年")}
+                      {formatWareki(p.nenki_list.next_nenki.date)}
                       {
                         p.nenki_list.last_nenki
                           ? <Box mt={1}>
                             [前回]
                             <br/>
-                            {p.nenki_list.last_nenki.title}: {p.nenki_list.last_nenki.date.format("YYYY/M/D")} ({koyomi.format(p.nenki_list.last_nenki.date.format("YYYY-M-D"), "GGN年M月D日>>元年")})
+                            {p.nenki_list.last_nenki.title}: {p.nenki_list.last_nenki.date.format("YYYY/M/D")} ({formatWareki(p.nenki_list.last_nenki.date)})
                           </Box>
                           : null
                       }
@@ -59,7 +58,7 @@ export default function NenkiTable(props: { persons: Person[] | undefined, setEd
                     <Box>
                       [前回]
                       <br/>
-                      {p.nenki_list.last_nenki!.title}: {p.nenki_list.last_nenki!.date.format("YYYY/M/D")} ({koyomi.format(p.nenki_list.last_nenki!.date.format("YYYY-M-D"), "GGN年M月D日>>元年")})
+                      {p.nenki_list.last_nenki!.title}: {p.nenki_list.last_nenki!.date.format("YYYY/M/D")} ({formatWareki(p.nenki_list.last_nenki!.date)})
                     </Box>
                   }>
                     <span>{p.nenki_list.last_nenki!.title}が終わっています</span>
@@ -80,11 +79,11 @@ export default function NenkiTable(props: { persons: Person[] | undefined, setEd
             <TableCell align="right">{
               p.birth_date !== null
                 ? (p.is_birth_date_accurate
-                    ? <Tooltip title={koyomi.format(p.birth_date.format("YYYY-M-D"), "GGN年M月D日>>元年")}>
+                    ? <Tooltip title={formatWareki(p.birth_date)}>
                       <span>{p.birth_date.format("YYYY/M/D")}</span>
                     </Tooltip>
                     : <Tooltip title={
-                      `${p.birth_date.format("YYYY/M/D")} (${koyomi.format(p.birth_date.format("YYYY-M-D"), "GGN年M月D日>>元年")}) 頃`}
+                      `${p.birth_date.format("YYYY/M/D")} (${formatWareki(p.birth_date)}) 頃`}
                     >
                       <span>(不正確)</span>
                     </Tooltip>

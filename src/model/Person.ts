@@ -1,6 +1,5 @@
-import moment, {Moment} from "moment-timezone";
-import assert from "assert";
-import NenkiList from "./NenkiList";
+import moment, {type Moment} from "moment-timezone";
+import NenkiList from "./NenkiList.ts";
 
 export default class Person {
   /**
@@ -43,7 +42,9 @@ export default class Person {
    * @param {boolean | null} is_birth_date_accurate 生年月日は正確かどうか (birth_dateがnull時はnull)
    */
   constructor(db_id: number | null, name: string, title: string, death_date: Moment, birth_date: Moment | null, is_birth_date_accurate: boolean | null) {
-    assert(birth_date !== null || is_birth_date_accurate === null, "If birth_date is null, is_birth_date_accurate must be set null.");
+    if (birth_date === null && is_birth_date_accurate !== null) {
+      throw new Error("生年月日がない場合は、生年月日の正確性も未設定にしてください");
+    }
 
     this.db_id = db_id;
     this.name = name;

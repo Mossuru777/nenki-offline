@@ -126,3 +126,7 @@ files:
 
   - file-path: package-lock.json
     line: 3
+
+  # ロックファイルのルートパッケージにも同じバージョンを記録する。
+  - file-path: package-lock.json
+    line: 9
