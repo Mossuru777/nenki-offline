@@ -59,8 +59,6 @@ jobs:
     needs: bump-version
     permissions:
       contents: read
-      pages: write
-      id-token: write
     uses: ./.github/workflows/build_and_optionally_deploy.yml
     with:
       # ワークフローのトークンで公開したリリースは published イベントから再実行されない。

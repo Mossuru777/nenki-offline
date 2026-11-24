@@ -54,15 +54,8 @@ jobs:
         env:
           URL_PREFIX: ${{ github.event.repository.name }}
 
-      - name: Upload GitHub Pages files
-        if: ${{ (github.event_name == 'release' || inputs.deploy) && !vars.CLOUDFLARE_PAGES_PROJECT }}
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        with:
-          path: out/
-          include-hidden-files: true
-
       - name: Upload Cloudflare Pages files
-        if: ${{ (github.event_name == 'release' || inputs.deploy) && vars.CLOUDFLARE_PAGES_PROJECT }}
+        if: ${{ github.event_name == 'release' || inputs.deploy }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: cloudflare-pages
@@ -70,28 +63,9 @@ jobs:
           if-no-files-found: error
           include-hidden-files: true
 
-  deploy:
-    name: Deploy to GitHub Pages
-    if: ${{ (github.event_name == 'release' || inputs.deploy) && !vars.CLOUDFLARE_PAGES_PROJECT }}
-    needs: build-and-optionally-deploy
-    runs-on: ubuntu-latest
-    concurrency:
-      group: github-pages
-      cancel-in-progress: false
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy Next.js app to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
-
   deploy-cloudflare:
     name: Deploy to Cloudflare Pages
-    if: ${{ (github.event_name == 'release' || inputs.deploy) && vars.CLOUDFLARE_PAGES_PROJECT }}
+    if: ${{ github.event_name == 'release' || inputs.deploy }}
     needs: build-and-optionally-deploy
     runs-on: ubuntu-latest
     concurrency:
