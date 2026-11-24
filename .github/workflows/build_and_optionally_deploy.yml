@@ -11,7 +11,6 @@ on:
   workflow_call:
     inputs:
       deploy:
-        required: true
         default: false
         type: boolean
 
@@ -19,26 +18,19 @@ jobs:
   build-and-optionally-deploy:
     name: Build (optionally deploy)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '26'
-
-      - name: Get Node.js and npm versions
-        shell: bash
-        run: |
-          echo "NODE_VERSION=$(node --version)" >> $GITHUB_ENV
-          echo "NPM_VERSION=$(npm --version)" >> $GITHUB_ENV
-
-      - name: Cache npm cache directory
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-cache-${{ env.NODE_VERSION }}-${{ env.NPM_VERSION }}
+          cache: npm
 
       - name: Install npm packages
         shell: bash
@@ -53,9 +45,31 @@ jobs:
         env:
           URL_PREFIX: ${{ github.event.repository.name }}
 
-      - name: Deploy Next.js app to GitHub Pages
+      - name: Upload GitHub Pages files
         if: ${{ inputs.deploy == true }}
-        uses: peaceiris/actions-gh-pages@v3
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: github-pages-files
+          path: out/
+          if-no-files-found: error
+          include-hidden-files: true
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: ${{ inputs.deploy == true }}
+    needs: build-and-optionally-deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download GitHub Pages files
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: github-pages-files
+          path: out/
+
+      - name: Deploy Next.js app to GitHub Pages
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: out
