@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/build-service-worker.cjs",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "node --test"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -16,7 +17,6 @@
     "dexie": "^4.4.7",
     "dexie-react-hooks": "^1.1.7",
     "ics": "^3.12.1",
-    "koyomi": "https://codeload.github.com/yukik/koyomi/tar.gz/f6949a8973a4f81082cbf67b1dea7fce7e348650",
     "moment": "^2.31.0",
     "moment-timezone": "^0.6.6",
     "next": "^16.4.6",
