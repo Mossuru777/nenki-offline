@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 'lts/*'
+          node-version: '26'
 
       - name: Get Node.js and npm versions
         shell: bash
@@ -44,20 +44,17 @@ jobs:
         shell: bash
         run: npm ci --no-progress --no-audit
 
+      - name: Lint
+        run: npm run lint
+
       - name: Build Next.js app
         shell: bash
         run: npm run build
         env:
           URL_PREFIX: ${{ github.event.repository.name }}
 
-      - name: Export Next.js app
-        id: export_app
-        if: ${{ inputs.deploy == true }}
-        shell: bash
-        run: npm run export
-
       - name: Deploy Next.js app to GitHub Pages
-        if: ${{ steps.export_app.outcome == 'success' }}
+        if: ${{ inputs.deploy == true }}
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

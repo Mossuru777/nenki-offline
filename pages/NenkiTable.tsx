@@ -12,7 +12,6 @@ import TableBody from "@mui/material/TableBody";
 import Tooltip from "@mui/material/Tooltip";
 import Box from "@mui/material/Box";
 
-// @ts-ignore
 import koyomi from "koyomi";
 
 export default function NenkiTable(props: { persons: Person[] | undefined, setEditPerson: (person: Person) => void }) {

@@ -129,17 +129,11 @@ export default function PersonEditDialog(props: { editPerson: Person | null | un
       const momentDeathDate = moment.tz(deathDate, "YYYY-MM-DD", true, "Asia/Tokyo");
       const momentBirthDate = birthDate !== "" ? moment.tz(birthDate, "YYYY-MM-DD", true, "Asia/Tokyo") : null;
       const actualIsBirthDateAccurate = momentBirthDate !== null ? isBirthDateAccurate : null;
-      if (props.editPerson) {
-        props.editPerson.name = name;
-        props.editPerson.title = title;
-        props.editPerson.death_date = momentDeathDate;
-        props.editPerson.birth_date = momentBirthDate;
-        props.editPerson.is_birth_date_accurate = actualIsBirthDateAccurate;
-        return DB.instance.updatePerson(props.editPerson)
-      } else {
-        const add_person = new Person(null, name, title, momentDeathDate, momentBirthDate, actualIsBirthDateAccurate);
-        return DB.instance.addPerson(add_person);
-      }
+      const person = new Person(
+        props.editPerson?.db_id ?? null,
+        name, title, momentDeathDate, momentBirthDate, actualIsBirthDateAccurate
+      );
+      return props.editPerson ? DB.instance.updatePerson(person) : DB.instance.addPerson(person);
     } else {
       return Promise.reject({
         isNameValid,

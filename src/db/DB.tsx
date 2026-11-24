@@ -1,4 +1,4 @@
-import Dexie from "dexie";
+import Dexie, {type Table} from "dexie";
 import moment from "moment-timezone";
 import DBPerson from "./DBPerson";
 import Person from "../model/Person";
@@ -6,9 +6,10 @@ import Person from "../model/Person";
 export default class DB extends Dexie {
   static readonly instance: DB = new DB();
 
-  persons!: Dexie.Table<DBPerson, number>;
+  persons!: Table<DBPerson, number>;
 
   private constructor() {
+    // 既存の IndexedDB をそのまま開けるように、名前とスキーマを維持する。
     super("PersonDB");
     this.version(1).stores({
       persons: "++id, name, title, death_date_unixtime, birth_date_unixtime, is_birth_date_accurate"
@@ -16,24 +17,21 @@ export default class DB extends Dexie {
   }
 
   async addPerson(person: Person): Promise<number> {
-    const dp: DBPerson = {
+    return this.persons.add(this.toRecord(person));
+  }
+
+  async updatePerson(person: Person): Promise<number> {
+    return this.persons.update(person.db_id!, this.toRecord(person));
+  }
+
+  private toRecord(person: Person): Omit<DBPerson, "id"> {
+    return {
       name: person.name,
       title: person.title,
       death_date_unixtime: person.death_date.valueOf(),
       birth_date_unixtime: person.birth_date?.valueOf() ?? null,
       is_birth_date_accurate: person.is_birth_date_accurate
     };
-    return this.persons.add(dp);
-  }
-
-  async updatePerson(person: Person): Promise<number> {
-    return this.persons.update(person.db_id!, {
-      name: person.name,
-      title: person.title,
-      death_date_unixtime: person.death_date.valueOf(),
-      birth_date_unixtime: person.birth_date?.valueOf() ?? null,
-      is_birth_date_accurate: person.is_birth_date_accurate
-    });
   }
 
   async deletePerson(person: Person): Promise<void | PromiseRejectedResult> {
