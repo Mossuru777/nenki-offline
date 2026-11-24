@@ -1,4 +1,4 @@
-import type {Moment} from "moment";
+import type {Moment} from "moment-timezone";
 
 const japaneseYear = new Intl.DateTimeFormat("ja-JP-u-ca-japanese-nu-latn", {
   era: "long",

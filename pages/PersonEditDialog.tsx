@@ -1,5 +1,5 @@
 import * as React from "react";
-import moment from "moment";
+import moment from "moment-timezone";
 import Person from "../src/model/Person";
 import DB from "../src/db/DB";
 import Button from "@mui/material/Button";
@@ -13,7 +13,6 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Done";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
-import LoadingButton from "@mui/lab/LoadingButton";
 
 export default function PersonEditDialog(props: { editPerson: Person | null | undefined, closeDialog: () => void }) {
   type PersonEditFormValues = {
@@ -257,9 +256,9 @@ export default function PersonEditDialog(props: { editPerson: Person | null | un
         <DialogActions>
           {
             props.editPerson
-              ? <LoadingButton color="error" disabled={manipulatingDB} onClick={handleDeleteBtn}>
+              ? <Button color="error" disabled={manipulatingDB} onClick={handleDeleteBtn}>
                 <DeleteIcon/>
-              </LoadingButton>
+              </Button>
               : null
           }
           <div style={{flexGrow: 1}}/>
@@ -267,16 +266,16 @@ export default function PersonEditDialog(props: { editPerson: Person | null | un
                   onClick={props.closeDialog}>キャンセル</Button>
           {
             props.editPerson
-              ? <LoadingButton variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
+              ? <Button variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
                                startIcon={<EditIcon/>} onClick={handleAddOrUpdateBtn}
               >
                 更新
-              </LoadingButton>
-              : <LoadingButton variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
+              </Button>
+              : <Button variant="contained" loading={manipulatingDB} disabled={manipulatingDB}
                                startIcon={<AddIcon/>} onClick={handleAddOrUpdateBtn}
               >
                 追加
-              </LoadingButton>
+              </Button>
           }
         </DialogActions>
       </Dialog>

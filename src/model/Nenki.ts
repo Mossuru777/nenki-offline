@@ -1,6 +1,5 @@
-import assert from "assert";
-import moment, {Duration, Moment} from "moment-timezone";
-import Person from "./Person";
+import moment, {type Duration, type Moment} from "moment-timezone";
+import type Person from "./Person.ts";
 
 /**
  * 年忌法要
@@ -61,7 +60,9 @@ export default class Nenki {
     const days = duration.asDays();
 
     const houyou = Nenki.#HOUYOU_ARRAY.find(value => (value[0].asDays() - days) === 0);
-    assert(years >= 1 || houyou !== undefined, "不正なduration");
+    if (!(years >= 1 || houyou !== undefined)) {
+      throw new Error("不正な経過期間です");
+    }
 
     this.date = moment(person.death_date);
     this.date.add(duration);
