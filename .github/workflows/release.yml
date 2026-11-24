@@ -32,6 +32,8 @@ jobs:
   bump-version:
     name: Bump Version
     runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.release.outputs.release }}
     permissions:
       contents: write
       pull-requests: read
@@ -44,6 +46,7 @@ jobs:
           persist-credentials: false
 
       - uses: MeilCli/bump-release-action@c07980926b3f330788297279580f7f16f0633008 # v3.0.15
+        id: release
         with:
           config_path: .github/bump.yml
           bump: ${{ inputs.bump }}
@@ -55,8 +58,11 @@ jobs:
     name: Build and Deploy
     needs: bump-version
     permissions:
-      contents: write
+      contents: read
+      pages: write
+      id-token: write
     uses: ./.github/workflows/build_and_optionally_deploy.yml
     with:
-      # 試行実行ではビルドだけを行い、公開ブランチを更新しない。
-      deploy: ${{ !inputs.dry_run }}
+      # ワークフローのトークンで公開したリリースは published イベントから再実行されない。
+      deploy: ${{ !inputs.dry_run && !inputs.draft }}
+      ref: ${{ !inputs.dry_run && !inputs.draft && format('refs/tags/{0}', fromJSON(needs.bump-version.outputs.release).tag_name) || github.sha }}
