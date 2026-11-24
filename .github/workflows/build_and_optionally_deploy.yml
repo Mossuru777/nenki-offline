@@ -55,15 +55,24 @@ jobs:
           URL_PREFIX: ${{ github.event.repository.name }}
 
       - name: Upload GitHub Pages files
-        if: ${{ github.event_name == 'release' || inputs.deploy }}
+        if: ${{ (github.event_name == 'release' || inputs.deploy) && !vars.CLOUDFLARE_PAGES_PROJECT }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: out/
           include-hidden-files: true
 
+      - name: Upload Cloudflare Pages files
+        if: ${{ (github.event_name == 'release' || inputs.deploy) && vars.CLOUDFLARE_PAGES_PROJECT }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: cloudflare-pages
+          path: out/
+          if-no-files-found: error
+          include-hidden-files: true
+
   deploy:
     name: Deploy to GitHub Pages
-    if: ${{ github.event_name == 'release' || inputs.deploy }}
+    if: ${{ (github.event_name == 'release' || inputs.deploy) && !vars.CLOUDFLARE_PAGES_PROJECT }}
     needs: build-and-optionally-deploy
     runs-on: ubuntu-latest
     concurrency:
@@ -79,3 +88,36 @@ jobs:
       - name: Deploy Next.js app to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  deploy-cloudflare:
+    name: Deploy to Cloudflare Pages
+    if: ${{ (github.event_name == 'release' || inputs.deploy) && vars.CLOUDFLARE_PAGES_PROJECT }}
+    needs: build-and-optionally-deploy
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cloudflare-pages
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    environment:
+      name: cloudflare-pages
+      url: https://mossuru777.net/nenki-offline/
+    steps:
+      - name: Download Cloudflare Pages files
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: cloudflare-pages
+          path: pages-out/nenki-offline/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '26'
+          package-manager-cache: false
+
+      - name: Deploy release files
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+        run: npm exec --yes --package=wrangler@4.168.0 -- wrangler pages deploy pages-out --project-name="$PAGES_PROJECT" --branch=main
