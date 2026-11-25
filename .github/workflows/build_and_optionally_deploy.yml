@@ -89,9 +89,32 @@ jobs:
           node-version: '26'
           package-manager-cache: false
 
+      - name: Check cache purge configuration
+        env:
+          CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [[ -z "$CLOUDFLARE_ZONE_ID" || -z "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo '::error::Configure CLOUDFLARE_ZONE_ID and CLOUDFLARE_API_TOKEN in the cloudflare-pages environment.'
+            exit 1
+          fi
+
       - name: Deploy release files
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
         run: npm exec --yes --package=wrangler@4.168.0 -- wrangler pages deploy pages-out --project-name="$PAGES_PROJECT" --branch=main
+
+      - name: Purge production app path from Cloudflare cache
+        env:
+          CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        shell: bash
+        run: |
+          curl --silent --show-error --fail-with-body --retry 3 --max-time 30 \
+            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            --header 'Content-Type: application/json' \
+            --data '{"prefixes":["mossuru777.net/nenki-offline"]}' \
+            "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+            | jq -e '.success == true' > /dev/null
